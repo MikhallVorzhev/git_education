@@ -1,0 +1,187 @@
+git commit -am "comment" == git add + git commit все tracked files в дирректории
+git commit <path to file> == git add <path to file> + git commit
+git rm -f <path to file> == rm + git add, -r для папки, -f игнорируя несохраненные изменения, 
+--cached - удаление из индекса, но оставив на диске
+git mv <path to file> == mv + git add
+
+git branch -v -- ветка и идентификатор commit
+git branch <branch name> -- создание новой ветки
+git checkout <branch name> -- переключение на ветку 
+git checkout -b <branch name> -- создать и переключиться на новую ветку
+git checkout -f master -- переключиться на ветку мастер, отменив все измения, которые 
+были сделаны в ветке фича. Т.е. несохраненные записи из ветки фичи удалятся
+git checkout -f -- отменить все несохраненные изменения в текущей ветки
+
+git stash -- сохранить незаконченные изменения на ветке
+git checkout main -- переключиться на ветку main
+git checkout feature -- переключиться на ветку feature
+git stash pop -- вернуть незаконченные изменения на ветке
+
+git branch -f <branch_name> <commit hash> -- откатиться с последнего коммита,  на тот, который
+указан
+git branch -f <branch_name_1> <branch_name_2> -- применить последний коммит ветки 
+branch_name_2 к ветке branch_name_1. Ветка branch_name_1 превравится в ветку branch_name_2
+
+git checkout -B <branch_name> <hash commit> -- передвинуть (git branch -f master 2s3g)
+ + переключиться (git checkout master) на коммит 
+
+ git cherry-pick <hash commit> -- скопирует изменения из hash_commit в текущую ветку
+
+ git checkout <branch name> или <hash_commit> <file name> -- применить к текущей ветке
+ состояние файла из выбранной ветки или коммита, с записью в индекс
+ git reset <file name> -- сбросить состояние файла, удалив запись из индекса
+ git checkout <file name> -- вернуть состояние файла, которое указано в  индексе
+
+ git log --oneline -- компактный вывод git log
+ git log <branch name> --oneline -- компактный вывод gitlog для ветки <branch name>
+
+ git show <branch name> или <hash commit> -- подробный вывод коммитов
+ git show HEAD~ -- показать родитель коммита
+ git show HEAD~~ -- показать родитель коммита ниже
+ git show HEAD~~~ --показать родитель коммита ещё ниже
+ git show @~ -- короткое написание команды git show HEAD~
+
+ git show @~:<file name> -- отобразить файл из состояния родителя
+ git show <branch name>:<file name> -- отобразить файл из ветки
+
+git merge <branch name> -- сделать слияние из ветки <branch name> в текущую
+git branch -d <branch name> -- удалить ветку, с которой было слияние.
+git branch -D <branch name> -- удалить ветку, с которой не было слияния. Удаляется только 
+имя ветки, коммиты остаются.
+
+git branch <branch name> <hash commit> -- на случай случайного удаления ветки
+ будет создана ветка <branch name> на основе коммита <hash commit>
+
+
+=== reflog ===
+лог ссылок, на случай восстановления нужной ветки исходя из коммита
+в этом логе ведется история работы с заголовками
+cat .git/logs/HEAD  -- для просмотра всех обновлений и передвижений HEAD
+
+git reflog <branch name> -- аналог команды выше, только более красивый
+git reflog -- выведет историю по всем веткам
+git reflog --date=iso -- выведет историю с датой
+
+git checkout @{-1} -- переключиться на предыдущую ветку
+git checkout - -- переключиться на предыдущую ветку
+
+
+=== git reset ===
+git reset --hard -- удаление изменение всех tracked файлов, файлы untracked остаются на месте
+get clean -dxf -- удаление всех untracked файлов, включая дирректории и содержимое .gitignore
+        -d -- директория
+        x -- файлы игнорируемые в .gitignore
+        f -- ключ force
+Для очистики репозитория используются две команды
+
+git reset --hard <hash commit> -- вернуть репозиторий к состоянию коммита
+git reset --hard @~ -- вернуться на 1 комит ниже
+
+git reset --soft @~ -- аналогично git reset --hard. В случае soft происходят изменения
+в working directory и Index. В случае в git reset --hard изменения происходят в 
+working directory, index и repository (HEAD). Soft reset отменяет команду комит
+
+Примеры использования
+git reset --soft @~ //отменили последний комит, переключились на 1 коммит ниже
+// что-то поправили
+git commit -c ORIG_HEAD --описание можно поправить
+git commit -C ORIG_HEAD -- будет использовано ранее созданное описание
+git commit -C ORIG_HEAD --reset-author -- будет использовано ранее созданное
+описание и новый автор коммита
+git commit --amend -- аналогичен git reset --soft @~ и git commit -C ORIG_HEAD
+git commit --amend --reset-author -- делает текущего коммитора автором
+git commit --amend --no-edit -- отменяет вызов редактора
+git commit --amend -m -- переписать коммит
+     Пример
+     edit readme
+     git add readme
+     git commit --amend --reset-author
+
+git diff master beta
+git diff master...beta что именно изменилось с момента отхождения ветки от мастер к бета
+
+git diff -- сравнивает изменения между working directory и index
+git diff --cached -- сравнивает измения index и HEAD
+git diff HEAD -- сравнивает изменения между working directory и HEAD
+git diff commit -v -- verbose, откроется редактор для ввода комментария коммита и просмотра diff
+git diff index.html -- будут выведены измения только для файла index.html
+git diff --name-only master feature -- будет выведена разница только в именах файлов
+можно посмотреть пути и на этой основе уже посмотреть нужные файлы
+git diff commit1:path1 commit2:path2 сравнить файлы из разных branch
+git diff -- index.html -- принудительно сказать гиту, что пойдёт <path to file>, а не ветка
+git diff commit1 commit2 -- разница между двумя коммитами
+
+
+=== git log ===
+git log --pretty=medium -- default
+git log --pretty=oneline --abbrev-commit -- выведет короткий идентификатор + заголовок
+git log --oneline -- подобен команде выше, полностью эквивалентен
+git log --pretty=format:'%h %cd | %s%d [%an]' -- где
+        %h -- сокрашщеный id коммита
+        %cd -- дата коммитера
+        %s%d -- заголовок коммита и декорирование
+        %an -- имя автора
+get help log -- остальные ключи для данной команды
+        %cr -- покажет сколько времени назад был коммит
+
+git log --pretty=format:'%C(yellow)%h %cd | %s%d [%an]' --date=format:'%F %R' 
+где %C(yellow) цвет всей строки
+git log --pretty=format:'%C(yellow)%h %C(dim green)%cr | %s%d [%an]' --date=format:'%F %R' 
+где после %C(dim green) цвет станет зеленым
+
+git config --global pretty.my format:'%C(yellow)%h %C(blue)%cd %C(reset)|%C(green)%d %C(red)%s'
+задать свою цветовую схему
+git log --pretty=my -- высвести логи в соответсвии со своими настройками
+git config --global format.pretty my -- установить свои настройки по умолчанию для команды
+git log
+git config --global log.date format-local:'%F %R' -- установить глобальный вывод даты
+%F -- дата
+%R -- время
+git log --pretty=medium -- вывод логов длинных в формате по умолчанию
+git log -p -- добавляет к последнему комиту информацию о diff
+
+git log master feature --graph -- изобразит структуру веток master и feature
+
+git log feature ^master -- наш интересует ветка feature, коммиты из ветки master пропускаются
+git log master..feature -- аналогичен команде выше, покажет коммиты с 
+момента отхождения от master. Т.е. какие коммиты есть во feature, но нет в master
+git log ..feature -- аналогичен выше, HEAD сравнивается с feature
+
+git log feature..master -- посмотрит какие измения есть в master, но нет во feature
+git log feature.. -- аналогичен выше, feature сравнивается в HEAD
+
+git log feature.. --boundary -- показать коммит, на котором разделились ветки
+git log master...feature -- симметрическая разность
+
+git log index.html -- выведет коммиты, в которых менялся файл index.html
+git log -p index.html -- выведет коммиты и историю изменения файла (diff)
+
+git log -p --follow index.html -- если файл был перемеинован, но следует указать
+ключ --follow
+
+git log feature..master index.html -- выбрать коммиты в мастер от разветвления в feature
+относительно файла index.html
+
+git log feature..master -- крч, чего нет у feature, но есть в мастере
+=== filter ===
+git log --grep Run -- поиск коммитов, содержащих слово Run
+git log --grep Run --grep sayHi --all-match -- поиск по двум ключевым словам в одной записи
+без ключа --all-match будут выведены все строки, которые содержат Run или sayHi
+
+git log --grep 'say(Hi|Bye)' -P -- перлсовместимое регулярное выражение
+git config --global grep.patternType perl -- установить перлсовместимый поиск по умолчанию, 
+ключ -P больше не требуется
+git log -F -- ключ для отключения перлсовместимого регулярного выражения
+git log --grep run -i -- ключ -i ищет значения без учета регистра 
+
+git log -Gdiff -p -- вывведет все коммиты, в которых есть строка diff
+git log -G'function sayHi\(' -- аналогичен команде выше, просто пример с экранировкой
+git log -L 3,6:index.html -- вывод всех коммитов, в которых были измения в файле
+с 3 по 6 строку в файле index.html
+git log -L '/<head>/','/<\/head>/':index.html -- пример поиска фрагмента
+gti log --author=Vasya -- поиск по коммитору Vasya
+git log --before '2024-08-01' -- вывод коммитов до 1 августа
+git log --after '2024-08-15' -- вывод коммитов после 15 августа
+git blame filename -- указывает кто и когда добавил коммиты
+git blame readme--date=short -L 5,8 - короткий вывод даты, отобразит строки файла с 5 по 8
+
